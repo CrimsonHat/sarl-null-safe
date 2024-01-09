@@ -946,6 +946,7 @@ public class SarlCompiler extends XtendCompiler {
 		// that are not Java early exit statements.
 		// In this case, a Java "return" statement must be applied.
 		final boolean isPrimitiveVoidExpected = expectedReturnType.isPrimitiveVoid();
+		System.out.println("COMPILE");
 		if (!isPrimitiveVoidExpected && expr instanceof XBlockExpression) {
 			this.isOnJavaEarlyExit = true;
 		}

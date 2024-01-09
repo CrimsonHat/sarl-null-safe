@@ -27,6 +27,7 @@ import java.util.List;
 import com.google.inject.Inject;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.xtend.core.xtend.XtendPackage;
 import org.eclipse.xtext.common.types.TypesPackage;
 import org.eclipse.xtext.validation.AbstractDeclarativeValidator;
@@ -74,6 +75,7 @@ public class ExtraLanguageValidatorSupport extends AbstractDeclarativeValidator 
 	 */
 	@Check(CheckType.NORMAL)
 	public void checkExtraLanguageRules(EObject currentObject) {
+		System.out.println("check rules");
 		final List<AbstractExtraLanguageValidator> validators = this.validatorProvider.getValidators(
 				currentObject.eResource());
 		if (!validators.isEmpty()) {
@@ -84,5 +86,4 @@ public class ExtraLanguageValidatorSupport extends AbstractDeclarativeValidator 
 			}
 		}
 	}
-
 }
