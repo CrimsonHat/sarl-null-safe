@@ -75,7 +75,6 @@ public class ExtraLanguageValidatorSupport extends AbstractDeclarativeValidator 
 	 */
 	@Check(CheckType.NORMAL)
 	public void checkExtraLanguageRules(EObject currentObject) {
-		System.out.println("check rules");
 		final List<AbstractExtraLanguageValidator> validators = this.validatorProvider.getValidators(
 				currentObject.eResource());
 		if (!validators.isEmpty()) {

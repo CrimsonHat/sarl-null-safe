@@ -126,6 +126,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
+import io.sarl.lang.core.annotation.*;
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EAttribute;
@@ -238,10 +239,6 @@ import io.sarl.lang.core.DefaultSkill;
 import io.sarl.lang.core.Event;
 import io.sarl.lang.core.SARLVersion;
 import io.sarl.lang.core.Skill;
-import io.sarl.lang.core.annotation.EarlyExit;
-import io.sarl.lang.core.annotation.ErrorOnCall;
-import io.sarl.lang.core.annotation.InfoOnCall;
-import io.sarl.lang.core.annotation.WarningOnCall;
 import io.sarl.lang.core.util.OutParameter;
 import io.sarl.lang.core.util.SarlUtils;
 import io.sarl.lang.extralanguage.validator.ExtraLanguageValidatorSupport;
@@ -1212,13 +1209,13 @@ public class SARLValidator extends AbstractSARLValidator {
 
 	/** Check if the call to an unary minus operator may be ambiguous interpretation for the SARL
 	 * developper.
-	 * 
+	 *
 	 * <p>Let the SARL expression {@code -125.abs} that is invoking the function
 	 * {@code Math.abs} with extension method notation. According to the precedence
 	 * of the the SARL operator, this expression is interpreted as
 	 * {@code -abs(125)} and not {@code abs(-125)}. Indeed the minus sign is an operator
 	 * and not considered as a part of the number literal itself.
-	 * 
+	 *
 	 * <p>To avoid invalid interpretation of the expression by the SARL developper, a
 	 * warning is generated.
 	 *
@@ -2498,6 +2495,7 @@ public class SARLValidator extends AbstractSARLValidator {
 			final String errorOnCallAnnotation = ErrorOnCall.class.getName();
 			final String warningOnCallAnnotation = WarningOnCall.class.getName();
 			final String infoOnCallAnnotation = InfoOnCall.class.getName();
+			final String nullableAnnotation = Nullable.class.getName();
 			for (final XAnnotation annotation : annotationTarget.getAnnotations()) {
 				final JvmType type = annotation.getAnnotationType();
 				if (type != null && !type.eIsProxy()) {
@@ -2511,7 +2509,8 @@ public class SARLValidator extends AbstractSARLValidator {
 						}
 					} else if (!Objects.equal(type.getIdentifier(), errorOnCallAnnotation)
 							&& !Objects.equal(type.getIdentifier(), warningOnCallAnnotation)
-							&& !Objects.equal(type.getIdentifier(), infoOnCallAnnotation)) {
+							&& !Objects.equal(type.getIdentifier(), infoOnCallAnnotation)
+							&& !Objects.equal(type.getIdentifier(), nullableAnnotation)) {
 						final QualifiedName annotationName = this.qualifiedNameConverter.toQualifiedName(
 								type.getIdentifier());
 						if (annotationName.startsWith(reservedPackage)) {
