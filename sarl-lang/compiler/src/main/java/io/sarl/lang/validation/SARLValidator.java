@@ -128,6 +128,7 @@ import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import io.sarl.lang.core.annotation.*;
 import org.eclipse.emf.common.notify.Notifier;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EObject;
@@ -1686,6 +1687,48 @@ public class SARLValidator extends AbstractSARLValidator {
 						VARIABLE_NAME_DISALLOWED);
 			}
 			++index;
+		}
+	}
+
+	/**
+	 * Check for a `null` initial value without @Nullable annotation
+	 *
+	 * @param field field to check
+	 */
+	@Check(CheckType.FAST)
+	public void checkInitialNull(XtendField field) {
+		checkInitialNull(field.getInitialValue(), field.getAnnotations());
+	}
+	/**
+	 * Check for a `null` initial value without @Nullable annotation
+	 *
+	 * @param variable variable to check
+	 */
+	@Check(CheckType.FAST)
+	public void checkInitialNull(XVariableDeclaration variable) {
+		// TODO: Variables don't have annotations? Maybe XVariableDeclaration is not the right type?
+		// checkInitialNull(variable.getRight(), variable.getAnnotations());
+	}
+	/**
+	 * Check for a `null` initial value without @Nullable annotation
+	 *
+	 * @param initialValue initial value expression
+	 * @param annotations annotation associated with the variable
+	 */
+	private void checkInitialNull(XExpression initialValue, EList<XAnnotation> annotations) {
+		boolean nullableAnnotated = false;
+		for (XAnnotation annotation : annotations) {
+			if (annotation.getAnnotationType().getIdentifier().equals(Nullable.class.getName())) {
+				nullableAnnotated = true;
+			}
+		}
+		// TODO: how to check for a null expression?
+		if (initialValue.toString().equals("null /*literal*/") && !nullableAnnotated) {
+			warning("Initial value is null without @Nullable annotation",
+					initialValue,
+					null,
+					ValidationMessageAcceptor.INSIGNIFICANT_INDEX,
+					"TODO");
 		}
 	}
 
