@@ -1664,21 +1664,55 @@ public class SARLValidator extends AbstractSARLValidator {
 	 * @param field field to check
 	 */
 	@Check(CheckType.FAST)
-	public void checkInitialNull(XtendField field) {
-		boolean nullableAnnotated = false;
-		for (XAnnotation annotation : field.getAnnotations()) {
-			if (annotation.getAnnotationType().getIdentifier().equals(Nullable.class.getName())) {
-				nullableAnnotated = true;
-			}
-		}
-		// TODO: how to check for a null expression better?
-		if (field.getInitialValue().toString().equals("null /*literal*/") && !nullableAnnotated) {
+	public void checkInitialNull(SarlField field) {
+		if (isNull(field.getInitialValue()) && !isNullable(field)) {
 			warning("Initial value is null without @Nullable annotation",
 					field.getInitialValue(),
 					null,
 					ValidationMessageAcceptor.INSIGNIFICANT_INDEX,
 					INITIAL_NULL_WITHOUT_NULLABLE);
 		}
+	}
+
+	/**
+	 * Check for a parameter initialized to `null` without @Nullable annotation.
+	 *
+	 * @param param Parameter to check
+	 */
+	@Check(CheckType.FAST)
+	public void checkNullParam(SarlFormalParameter param) {
+		if (isNull(param.getDefaultValue()) && !isNullable(param)) {
+			warning("Initial value is null without @Nullable annotation",
+					param.getDefaultValue(),
+					null,
+					ValidationMessageAcceptor.INSIGNIFICANT_INDEX,
+					INITIAL_NULL_WITHOUT_NULLABLE);
+		}
+	}
+
+	/**
+	 * Deterines if the given expression is a `null`
+	 * @param expr
+	 * @return true if it is null, false otherwise
+	 */
+	protected boolean isNull(XExpression expr) {
+		// TODO: how to check for a null expression better?
+		return expr.toString().equals("null /*literal*/");
+	}
+
+	/**
+	 * Check if the given target has a @Nullable annotation
+	 * @param target
+	 * @return True if the target has a @Nullable annotation, false otherwise
+	 */
+	protected boolean isNullable(XtendAnnotationTarget target) {
+		boolean nullableAnnotated = false;
+		for (XAnnotation annotation : target.getAnnotations()) {
+			if (annotation.getAnnotationType().getIdentifier().equals(Nullable.class.getName())) {
+				nullableAnnotated = true;
+			}
+		}
+		return nullableAnnotated;
 	}
 
 	/** Check if the given local variable has a valid name.
