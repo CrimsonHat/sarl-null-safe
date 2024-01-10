@@ -53,3 +53,5 @@ workspace/
 **/.DS_Store
 dbg.log
 
+
+.idea
