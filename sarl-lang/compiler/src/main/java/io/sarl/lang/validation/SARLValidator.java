@@ -1696,8 +1696,7 @@ public class SARLValidator extends AbstractSARLValidator {
 	 * @return true if it is null, false otherwise
 	 */
 	protected boolean isNull(XExpression expr) {
-		// TODO: how to check for a null expression better?
-		return expr.toString().equals("null /*literal*/");
+		return expr instanceof XNullLiteral;
 	}
 
 	/**
