@@ -158,29 +158,7 @@ import org.eclipse.xtext.validation.CheckType;
 import org.eclipse.xtext.validation.ComposedChecks;
 import org.eclipse.xtext.validation.IssueSeverities;
 import org.eclipse.xtext.validation.ValidationMessageAcceptor;
-import org.eclipse.xtext.xbase.XAbstractFeatureCall;
-import org.eclipse.xtext.xbase.XAbstractWhileExpression;
-import org.eclipse.xtext.xbase.XAssignment;
-import org.eclipse.xtext.xbase.XBasicForLoopExpression;
-import org.eclipse.xtext.xbase.XBinaryOperation;
-import org.eclipse.xtext.xbase.XBlockExpression;
-import org.eclipse.xtext.xbase.XBooleanLiteral;
-import org.eclipse.xtext.xbase.XCastedExpression;
-import org.eclipse.xtext.xbase.XClosure;
-import org.eclipse.xtext.xbase.XConstructorCall;
-import org.eclipse.xtext.xbase.XExpression;
-import org.eclipse.xtext.xbase.XFeatureCall;
-import org.eclipse.xtext.xbase.XForLoopExpression;
-import org.eclipse.xtext.xbase.XMemberFeatureCall;
-import org.eclipse.xtext.xbase.XNullLiteral;
-import org.eclipse.xtext.xbase.XNumberLiteral;
-import org.eclipse.xtext.xbase.XPostfixOperation;
-import org.eclipse.xtext.xbase.XStringLiteral;
-import org.eclipse.xtext.xbase.XSynchronizedExpression;
-import org.eclipse.xtext.xbase.XTypeLiteral;
-import org.eclipse.xtext.xbase.XUnaryOperation;
-import org.eclipse.xtext.xbase.XVariableDeclaration;
-import org.eclipse.xtext.xbase.XbasePackage;
+import org.eclipse.xtext.xbase.*;
 import org.eclipse.xtext.xbase.annotations.xAnnotations.XAnnotation;
 import org.eclipse.xtext.xbase.compiler.GeneratorConfig;
 import org.eclipse.xtext.xbase.lib.CollectionLiterals;
@@ -1137,6 +1115,32 @@ public class SARLValidator extends AbstractSARLValidator {
 				doGetConstructorParameterTypes(Object.class, xtendClass));
 	}
 
+	/**
+	 * Check if a method is called on a potentially null value.
+	 * @param call Callsite
+	 */
+	@Check(CheckType.FAST)
+	public void checkNullCall(XAbstractFeatureCall call) {
+		EObject receiver = call.getActualReceiver().eCrossReferences().get(0);
+		if (call.getActualReceiver() == null) return;
+
+		// TODO: also params
+		if (receiver instanceof JvmField field && isNullable(field)) {
+			EObject container = call.eContainer();
+			// TODO: xtext does not let this run for too long, skipping the warning if no `if` if found
+			while (!(container instanceof XIfExpression)) {
+				container = container.eContainer();
+			}
+            XIfExpression ifExpression = (XIfExpression) container;
+			// TODO: absolutely no doc on how to use getIf()
+            if (ifExpression.getIf().toString().equals("<XFeatureCallImplCustom> !== <XNullLiteralImplCustom>")) {
+                // If our variable is tested against null then this is safe
+                return;
+            }
+            warning("Calling on a potentially null value", call, null, ValidationMessageAcceptor.INSIGNIFICANT_INDEX, "TODO");
+		}
+	}
+
 	/** Check if the call is forbidden.
 	 *
 	 * <p>One example of a forbidden feature is {@link System#exit(int)}.
@@ -1708,6 +1712,15 @@ public class SARLValidator extends AbstractSARLValidator {
 		boolean nullableAnnotated = false;
 		for (XAnnotation annotation : target.getAnnotations()) {
 			if (annotation.getAnnotationType().getIdentifier().equals(Nullable.class.getName())) {
+				nullableAnnotated = true;
+			}
+		}
+		return nullableAnnotated;
+	}
+	protected boolean isNullable(JvmAnnotationTarget target) {
+		boolean nullableAnnotated = false;
+		for (JvmAnnotationReference annotation : target.getAnnotations()) {
+			if (annotation.getAnnotation().getIdentifier().equals(Nullable.class.getName())) {
 				nullableAnnotated = true;
 			}
 		}
