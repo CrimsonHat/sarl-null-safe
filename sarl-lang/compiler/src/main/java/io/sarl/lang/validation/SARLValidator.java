@@ -31,38 +31,7 @@ import static io.sarl.lang.sarl.SarlPackage.Literals.SARL_EVENT__EXTENDS;
 import static io.sarl.lang.sarl.SarlPackage.Literals.SARL_FORMAL_PARAMETER__DEFAULT_VALUE;
 import static io.sarl.lang.sarl.SarlPackage.Literals.SARL_SKILL__EXTENDS;
 import static io.sarl.lang.sarl.SarlPackage.Literals.SARL_SKILL__IMPLEMENTS;
-import static io.sarl.lang.validation.IssueCodes.AMBIGUOUS_INTERPRETATION_BY_DEVELOPPER;
-import static io.sarl.lang.validation.IssueCodes.DISCOURAGED_BOOLEAN_EXPRESSION;
-import static io.sarl.lang.validation.IssueCodes.DISCOURAGED_CAPACITY_DEFINITION;
-import static io.sarl.lang.validation.IssueCodes.DISCOURAGED_FUNCTION_NAME;
-import static io.sarl.lang.validation.IssueCodes.DISCOURAGED_LOOP_BREAKING_KEYWORD_USE;
-import static io.sarl.lang.validation.IssueCodes.DISCOURAGED_OCCURRENCE_READONLY_USE;
-import static io.sarl.lang.validation.IssueCodes.GENERIC_TYPE_NAME_SHADOWING;
-import static io.sarl.lang.validation.IssueCodes.ILLEGAL_PARAMETER_DEFAULT_VALUE_REDEFINITION;
-import static io.sarl.lang.validation.IssueCodes.INVALID_CAPACITY_TYPE;
-import static io.sarl.lang.validation.IssueCodes.INVALID_DEFAULT_SKILL_ANNOTATION;
-import static io.sarl.lang.validation.IssueCodes.INVALID_EXTENDED_TYPE;
-import static io.sarl.lang.validation.IssueCodes.INVALID_FIRING_EVENT_TYPE;
-import static io.sarl.lang.validation.IssueCodes.INVALID_IMPLEMENTED_TYPE;
-import static io.sarl.lang.validation.IssueCodes.INVALID_NESTED_DEFINITION;
-import static io.sarl.lang.validation.IssueCodes.INVALID_OCCURRENCE_READONLY_USE;
-import static io.sarl.lang.validation.IssueCodes.INVALID_SARL_LIB_ON_CLASSPATH;
-import static io.sarl.lang.validation.IssueCodes.INVALID_USE_OF_LOOP_BREAKING_KEYWORD;
-import static io.sarl.lang.validation.IssueCodes.MANUAL_INLINE_DEFINITION;
-import static io.sarl.lang.validation.IssueCodes.MISSING_BODY;
-import static io.sarl.lang.validation.IssueCodes.PARAMETER_DEFAULT_VALUE_REDFINITION;
-import static io.sarl.lang.validation.IssueCodes.POTENTIAL_FIELD_SYNCHRONIZATION_PROBLEM;
-import static io.sarl.lang.validation.IssueCodes.POTENTIAL_INEFFICIENT_VALUE_CONVERSION;
-import static io.sarl.lang.validation.IssueCodes.PROGRAMMATIC_ISSUE_ANNOTATION;
-import static io.sarl.lang.validation.IssueCodes.REDUNDANT_CAPACITY_USE;
-import static io.sarl.lang.validation.IssueCodes.REDUNDANT_INTERFACE_IMPLEMENTATION;
-import static io.sarl.lang.validation.IssueCodes.RETURN_TYPE_SPECIFICATION_IS_RECOMMENDED;
-import static io.sarl.lang.validation.IssueCodes.SARL_LIB_NOT_ON_CLASSPATH;
-import static io.sarl.lang.validation.IssueCodes.UNEXPECTED_EXCEPTION_THROW;
-import static io.sarl.lang.validation.IssueCodes.UNEXPECTED_FORMAL_PARAMETER;
-import static io.sarl.lang.validation.IssueCodes.UNREACHABLE_BEHAVIOR_UNIT;
-import static io.sarl.lang.validation.IssueCodes.UNUSED_AGENT_CAPACITY;
-import static io.sarl.lang.validation.IssueCodes.USED_RESERVED_SARL_ANNOTATION;
+import static io.sarl.lang.validation.IssueCodes.*;
 import static org.eclipse.xtend.core.validation.IssueCodes.ABSTRACT_METHOD_WITH_BODY;
 import static org.eclipse.xtend.core.validation.IssueCodes.ANNOTATION_WRONG_TARGET;
 import static org.eclipse.xtend.core.validation.IssueCodes.CLASS_EXPECTED;
@@ -128,7 +97,6 @@ import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import io.sarl.lang.core.annotation.*;
 import org.eclipse.emf.common.notify.Notifier;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EObject;
@@ -1697,38 +1665,19 @@ public class SARLValidator extends AbstractSARLValidator {
 	 */
 	@Check(CheckType.FAST)
 	public void checkInitialNull(XtendField field) {
-		checkInitialNull(field.getInitialValue(), field.getAnnotations());
-	}
-	/**
-	 * Check for a `null` initial value without @Nullable annotation
-	 *
-	 * @param variable variable to check
-	 */
-	@Check(CheckType.FAST)
-	public void checkInitialNull(XVariableDeclaration variable) {
-		// TODO: Variables don't have annotations? Maybe XVariableDeclaration is not the right type?
-		// checkInitialNull(variable.getRight(), variable.getAnnotations());
-	}
-	/**
-	 * Check for a `null` initial value without @Nullable annotation
-	 *
-	 * @param initialValue initial value expression
-	 * @param annotations annotation associated with the variable
-	 */
-	private void checkInitialNull(XExpression initialValue, EList<XAnnotation> annotations) {
 		boolean nullableAnnotated = false;
-		for (XAnnotation annotation : annotations) {
+		for (XAnnotation annotation : field.getAnnotations()) {
 			if (annotation.getAnnotationType().getIdentifier().equals(Nullable.class.getName())) {
 				nullableAnnotated = true;
 			}
 		}
-		// TODO: how to check for a null expression?
-		if (initialValue.toString().equals("null /*literal*/") && !nullableAnnotated) {
+		// TODO: how to check for a null expression better?
+		if (field.getInitialValue().toString().equals("null /*literal*/") && !nullableAnnotated) {
 			warning("Initial value is null without @Nullable annotation",
-					initialValue,
+					field.getInitialValue(),
 					null,
 					ValidationMessageAcceptor.INSIGNIFICANT_INDEX,
-					"TODO");
+					INITIAL_NULL_WITHOUT_NULLABLE);
 		}
 	}
 

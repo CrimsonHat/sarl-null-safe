@@ -271,6 +271,11 @@ public final class IssueCodes {
 	public static final String AMBIGUOUS_INTERPRETATION_BY_DEVELOPPER =
 			ISSUE_CODE_PREFIX + "ambiguous_interpretation_by_developper"; //$NON-NLS-1$
 
+	/**
+	 * A field may not be initialized with null without the @Nullable annotation.
+	 */
+	public static final String INITIAL_NULL_WITHOUT_NULLABLE = ISSUE_CODE_PREFIX + "initial_null_without_nullable";
+
 	private IssueCodes() {
 		//
 	}
