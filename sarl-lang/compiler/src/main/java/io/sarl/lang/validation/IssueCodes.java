@@ -280,6 +280,10 @@ public final class IssueCodes {
 	 * We may not call on a nullable value without checking for its nullity
 	 */
 	public static final String CALLING_POTENTIALLY_NULL_VALUE = ISSUE_CODE_PREFIX + "calling_potentially_null_value";
+	/**
+	 * Sometimes values are guaranteed not to change and as such are always null
+	 */
+	public static final String CALLING_NULL_VALUE = ISSUE_CODE_PREFIX + "calling_null_value";
 
 	/**
 	 * We may not assign null to a variable without @Nullable

@@ -58,17 +58,7 @@ import static org.eclipse.xtend.core.xtend.XtendPackage.Literals.XTEND_FUNCTION_
 import static org.eclipse.xtend.core.xtend.XtendPackage.Literals.XTEND_INTERFACE__EXTENDS;
 import static org.eclipse.xtend.core.xtend.XtendPackage.Literals.XTEND_TYPE_DECLARATION__NAME;
 import static org.eclipse.xtext.util.JavaVersion.JAVA8;
-import static org.eclipse.xtext.xbase.validation.IssueCodes.DISCOURAGED_REFERENCE;
-import static org.eclipse.xtext.xbase.validation.IssueCodes.FORBIDDEN_REFERENCE;
-import static org.eclipse.xtext.xbase.validation.IssueCodes.INCOMPATIBLE_RETURN_TYPE;
-import static org.eclipse.xtext.xbase.validation.IssueCodes.INCOMPATIBLE_TYPES;
-import static org.eclipse.xtext.xbase.validation.IssueCodes.INVALID_INNER_EXPRESSION;
-import static org.eclipse.xtext.xbase.validation.IssueCodes.INVALID_TYPE;
-import static org.eclipse.xtext.xbase.validation.IssueCodes.MISSING_TYPE;
-import static org.eclipse.xtext.xbase.validation.IssueCodes.OBSOLETE_CAST;
-import static org.eclipse.xtext.xbase.validation.IssueCodes.TYPE_BOUNDS_MISMATCH;
-import static org.eclipse.xtext.xbase.validation.IssueCodes.VARIABLE_NAME_DISALLOWED;
-import static org.eclipse.xtext.xbase.validation.IssueCodes.VARIABLE_NAME_SHADOWING;
+import static org.eclipse.xtext.xbase.validation.IssueCodes.*;
 
 import java.lang.annotation.ElementType;
 import java.lang.reflect.Field;
@@ -1139,15 +1129,32 @@ public class SARLValidator extends AbstractSARLValidator {
 				&& (ifExpression.getIf().toString().equals("<XFeatureCallImplCustom> !== <XNullLiteralImplCustom>")
 					|| ifExpression.getIf().toString().equals("<XNullLiteralImplCustom> !== <XFeatureCallImplCustom>"))
 			) {
+				if (receiver instanceof JvmField field && field.isFinal()) {
+					warning("This will never be called as the null check condition surrounding it is always false",
+							call,
+							null,
+							ValidationMessageAcceptor.INSIGNIFICANT_INDEX,
+							UNREACHABLE_CODE);
+				}
 				// If our variable is tested against null then this is safe
 				return;
 			}
 
-            warning("Calling on a potentially null value",
-					call,
-                    null,
-					ValidationMessageAcceptor.INSIGNIFICANT_INDEX,
-					CALLING_POTENTIALLY_NULL_VALUE);
+			if (receiver instanceof JvmField field && field.isFinal()) {
+				// We are sure this is always null
+				error("Calling a method on a null value",
+						call,
+						null,
+						ValidationMessageAcceptor.INSIGNIFICANT_INDEX,
+						CALLING_NULL_VALUE);
+			} else {
+				// This might not be null depending on assignment
+				warning("Calling on a potentially null value",
+						call,
+						null,
+						ValidationMessageAcceptor.INSIGNIFICANT_INDEX,
+						CALLING_POTENTIALLY_NULL_VALUE);
+			}
 		}
 	}
 
