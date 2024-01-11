@@ -281,6 +281,11 @@ public final class IssueCodes {
 	 */
 	public static final String CALLING_POTENTIALLY_NULL_VALUE = ISSUE_CODE_PREFIX + "calling_potentially_null_value";
 
+	/**
+	 * We may not assign null to a variable without @Nullable
+	 */
+	public static final String ASSIGN_NULL_TO_NON_NULLABLE = ISSUE_CODE_PREFIX + "assign_null_to_non_nullable";
+
 	private IssueCodes() {
 		//
 	}

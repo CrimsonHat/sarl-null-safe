@@ -1122,7 +1122,6 @@ public class SARLValidator extends AbstractSARLValidator {
 	@Check(CheckType.FAST)
 	public void checkNullCall(XAbstractFeatureCall call) {
 		EObject receiver = call.getActualReceiver().eCrossReferences().get(0);
-		if (call.getActualReceiver() == null) return;
 
 		if ((receiver instanceof JvmField field && isNullable(field))
 				|| (receiver instanceof JvmFormalParameter param && isNullable(param))) {
@@ -1149,6 +1148,23 @@ public class SARLValidator extends AbstractSARLValidator {
                     null,
 					ValidationMessageAcceptor.INSIGNIFICANT_INDEX,
 					CALLING_POTENTIALLY_NULL_VALUE);
+		}
+	}
+
+	/**
+	 * Check if we try to assign null to a non-nullable field/parameter
+	 * @param assignment Assignment expression
+	 */
+	@Check(CheckType.FAST)
+	public void checkNullAssign(XAssignment assignment) {
+		if (isNull(assignment.getValue())
+				&& assignment.getFeature() instanceof JvmField field
+				&& !isNullable(field)) {
+			warning("Assigning null to a non-nullable item, consider adding @Nullable to this item",
+					assignment,
+					null,
+					ValidationMessageAcceptor.INSIGNIFICANT_INDEX,
+					ASSIGN_NULL_TO_NON_NULLABLE);
 		}
 	}
 
