@@ -276,6 +276,11 @@ public final class IssueCodes {
 	 */
 	public static final String INITIAL_NULL_WITHOUT_NULLABLE = ISSUE_CODE_PREFIX + "initial_null_without_nullable";
 
+	/**
+	 * We may not call on a nullable value without checking for its nullity
+	 */
+	public static final String CALLING_POTENTIALLY_NULL_VALUE = ISSUE_CODE_PREFIX + "calling_potentially_null_value";
+
 	private IssueCodes() {
 		//
 	}

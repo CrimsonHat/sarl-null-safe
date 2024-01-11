@@ -1126,18 +1126,29 @@ public class SARLValidator extends AbstractSARLValidator {
 
 		// TODO: also params
 		if (receiver instanceof JvmField field && isNullable(field)) {
+			// Get an eventual containing if
+			// In theory should work for nested if, but actually does not ...
 			EObject container = call.eContainer();
-			// TODO: xtext does not let this run for too long, skipping the warning if no `if` if found
-			while (!(container instanceof XIfExpression)) {
+			while (!(container instanceof XIfExpression) && container != null) {
 				container = container.eContainer();
 			}
-            XIfExpression ifExpression = (XIfExpression) container;
+
 			// TODO: absolutely no doc on how to use getIf()
-            if (ifExpression.getIf().toString().equals("<XFeatureCallImplCustom> !== <XNullLiteralImplCustom>")) {
-                // If our variable is tested against null then this is safe
-                return;
-            }
-            warning("Calling on a potentially null value", call, null, ValidationMessageAcceptor.INSIGNIFICANT_INDEX, "TODO");
+			// So checking equality with toString
+			// We should also check if this is the correct variable tested against null
+			if (container instanceof XIfExpression ifExpression
+				&& (ifExpression.getIf().toString().equals("<XFeatureCallImplCustom> !== <XNullLiteralImplCustom>")
+					|| ifExpression.getIf().toString().equals("<XNullLiteralImplCustom> !== <XFeatureCallImplCustom>"))
+			) {
+				// If our variable is tested against null then this is safe
+				return;
+			}
+
+            warning("Calling on a potentially null value",
+					call,
+                    null,
+					ValidationMessageAcceptor.INSIGNIFICANT_INDEX,
+					CALLING_POTENTIALLY_NULL_VALUE);
 		}
 	}
 
