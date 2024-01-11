@@ -1124,8 +1124,8 @@ public class SARLValidator extends AbstractSARLValidator {
 		EObject receiver = call.getActualReceiver().eCrossReferences().get(0);
 		if (call.getActualReceiver() == null) return;
 
-		// TODO: also params
-		if (receiver instanceof JvmField field && isNullable(field)) {
+		if ((receiver instanceof JvmField field && isNullable(field))
+				|| (receiver instanceof JvmFormalParameter param && isNullable(param))) {
 			// Get an eventual containing if
 			// In theory should work for nested if, but actually does not ...
 			EObject container = call.eContainer();
