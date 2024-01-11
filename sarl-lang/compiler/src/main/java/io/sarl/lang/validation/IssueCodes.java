@@ -289,6 +289,10 @@ public final class IssueCodes {
 	 * We may not assign null to a variable without @Nullable
 	 */
 	public static final String ASSIGN_NULL_TO_NON_NULLABLE = ISSUE_CODE_PREFIX + "assign_null_to_non_nullable";
+	/**
+	 * A field assigned a non-null don't need to be nullable
+	 */
+	public static final String FIELD_CANNOT_BE_NULL = ISSUE_CODE_PREFIX + "field_cannot_be_null";
 
 	private IssueCodes() {
 		//

@@ -1713,6 +1713,24 @@ public class SARLValidator extends AbstractSARLValidator {
 	}
 
 	/**
+	 * Check for a final field with a value and a @Nullable annotation
+	 *
+	 * @param field Field to check
+	 */
+	@Check(CheckType.FAST)
+	public void checkNullableField(SarlField field) {
+		if (!isNull(field.getInitialValue())
+				&& isNullable(field)
+				&& field.isFinal()) {
+			warning("Field cannot be null, consider removing @Nullable",
+					field,
+					null,
+					ValidationMessageAcceptor.INSIGNIFICANT_INDEX,
+					FIELD_CANNOT_BE_NULL);
+		}
+	}
+
+	/**
 	 * Check for a parameter initialized to `null` without @Nullable annotation.
 	 *
 	 * @param param Parameter to check
